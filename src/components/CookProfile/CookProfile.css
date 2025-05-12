@@ -1,0 +1,185 @@
+.cook-profile-setup-container {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 25px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.cook-profile-setup-container h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #333;
+}
+
+.profile-form .form-group {
+    margin-bottom: 20px;
+}
+
+.profile-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #555;
+}
+
+.profile-form input[type="text"],
+.profile-form input[type="tel"],
+.profile-form input[type="email"], /* If adding email */
+.profile-form input[type="file"],
+.profile-form select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* Include padding and border in element's total width/height */
+    font-size: 1em;
+}
+
+.profile-form input:focus,
+.profile-form select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.profile-form input[type="file"] {
+    padding: 5px; /* Different padding for file input */
+}
+
+/* Image Preview Styling */
+.form-group-image label {
+    margin-bottom: 10px;
+}
+.image-preview-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+.image-preview {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #ddd;
+}
+.image-placeholder {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #aaa;
+    font-size: 0.8em;
+    border: 1px solid #ddd;
+}
+.form-group-image input[type="file"] {
+   display: none; /* Hide default file input */
+}
+.form-group-image button { /* Style the custom 'Choose Image' button */
+    padding: 8px 12px;
+    /* Add button styles */
+}
+
+
+/* Expertise Styling */
+.expertise-input-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+.expertise-input-group input {
+    flex-grow: 1;
+}
+.add-tag-button {
+   padding: 10px 15px;
+   flex-shrink: 0;
+   /* Add button styles */
+}
+.expertise-tags-display {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-height: 20px; /* Ensure space even when empty */
+}
+.expertise-tags-display .tag { /* Use styles from CookCard.css or redefine */
+    background-color: #e7f3ff;
+    color: #005cb9;
+    padding: 4px 10px 4px 10px; /* Adjust padding */
+    border-radius: 12px;
+    font-size: 0.9em;
+    display: flex; /* For aligning remove button */
+    align-items: center;
+    gap: 5px;
+}
+.remove-tag-button {
+    background: none;
+    border: none;
+    color: #005cb9; /* Match tag color or use a contrast */
+    cursor: pointer;
+    font-size: 1.2em; /* Make 'x' slightly larger */
+    line-height: 1;
+    padding: 0;
+    margin-left: 3px; /* Space it from text */
+    opacity: 0.7;
+}
+.remove-tag-button:hover {
+    opacity: 1;
+    color: #cc0000; /* Optional: danger color on hover */
+}
+
+/* Location Styling */
+.form-group-location label {
+    margin-bottom: 10px;
+}
+.location-info {
+    font-style: italic;
+    color: #666;
+    margin-bottom: 10px;
+}
+.location-button {
+    padding: 10px 15px;
+    margin-bottom: 10px; /* Space before manual inputs if added */
+    /* Add button styles */
+}
+
+.form-actions {
+    text-align: center;
+    margin-top: 30px;
+}
+
+/* Use styles defined in CookCard.css or App.css if available */
+.submit-button.primary-button {
+    padding: 12px 25px;
+    font-size: 1.1em;
+}
+
+.error-message {
+  color: #dc3545;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.success-message {
+  color: #198754;
+  background-color: #d1e7dd;
+  border: 1px solid #a3cfbb;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+/* Add styles for disabled states */
+button:disabled, input:disabled, select:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}

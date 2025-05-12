@@ -1,0 +1,78 @@
+.home-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+    background: linear-gradient( 
+    rgba(227, 167, 101, 0.2) 100% 
+  );
+    text-align: center;
+  }
+  .content-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  .home-logo {
+    max-width: 60%;
+    height: auto;
+    margin-bottom: 40px; 
+  }
+  
+  .auth-actions {
+    display: flex;
+    flex-direction: column; 
+    align-items: center;
+    width: 100%; 
+    gap: 15px;
+  }
+  
+  .auth-button {
+    display: inline-block;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 25px; 
+    font-size: 1rem; 
+    font-weight: bold;
+    text-decoration: none; 
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    width: 80%; 
+    max-width: 250px;
+    box-sizing: border-box;
+  }
+  
+  .signin-button {
+    background-color: black; 
+    color: white;
+  }
+  
+  .signup-button {
+    background-color:rgb(105, 82, 82); 
+    color: white;
+  }
+  
+  .auth-button:hover {
+    opacity: 0.9;
+    transform: scale(1.03);
+  }
+  
+  @media (min-width: 600px) {
+    .auth-actions {
+    gap: 20px; /* Adjust gap if side-by-side */
+    }
+  
+    .auth-button {
+    }
+  
+    .home-logo {
+      max-width: 200px;
+    }
+  }

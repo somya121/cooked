@@ -1,0 +1,17 @@
+.app-header {
+    display: flex;
+    align-items: center;
+    height: 70px;        
+    padding: 0 20px;
+    background-color: rgba(227, 167, 101, 0.2); 
+  }
+  
+.header-logo-container{
+    display: flex;
+   align-items: center;
+}
+.header-logo{
+    display: block; 
+    max-height: 50px; 
+    width: auto;
+}
