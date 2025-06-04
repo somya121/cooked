@@ -14,7 +14,7 @@ import MyBookingsPage from './components/MyBookingsPage/MyBookingsPage';
 import Header from './components/Header/Header';
 import {setSessionExpiredCallback} from './utils/authUtils';
 
-const BACKEND_BASE_URL = process.env.REACT_APP_BACKEND_BASE_URL || 'http://localhost:8080';
+const BACKEND_BASE_URL = process.env.REACT_APP_BACKEND_BASE_URL ;
 function AppContent() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [authToken, setAuthToken] = useState(null);

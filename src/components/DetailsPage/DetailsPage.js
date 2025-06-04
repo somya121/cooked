@@ -5,7 +5,7 @@ import CookCard from '../CookCard/CookCard.js';
 import { triggerSessionExpiredLogout } from '../../utils/authUtils';
 import './DetailsPage.css';
 
-const BACKEND_BASE_URL = process.env.REACT_APP_BACKEND_BASE_URL || 'http://localhost:8080';
+const BACKEND_BASE_URL = process.env.REACT_APP_BACKEND_BASE_URL;
 
 async function fetchApi(url, options = {}) {
     const token = localStorage.getItem('authToken'); 

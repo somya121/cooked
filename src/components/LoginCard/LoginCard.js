@@ -14,7 +14,7 @@ function LoginCard({ flowType = 'user', onLoginSuccess }) {
     const [error, setError] = useState(null);
     const [nextStep, setNextStep] = useState('initial');
     const [emailExists, setemailExists] = useState(false);
-    const BACKEND_BASE_URL = process.env.REACT_APP_BACKEND_BASE_URL || 'http://localhost:8080';
+    const BACKEND_BASE_URL = process.env.REACT_APP_BACKEND_BASE_URL;
     const navigate = useNavigate();
 
     const handleContinue = async (event) => {

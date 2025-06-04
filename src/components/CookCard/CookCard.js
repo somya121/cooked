@@ -4,7 +4,7 @@ import './CookCard.css';
 // import defaultAvatar from './default-avatar.png'; // Example import
 
 const defaultAvatarSrc = '/images/default-avatar.png';
-const BACKEND_BASE_URL = process.env.REACT_APP_BACKEND_BASE_URL || 'http://localhost:8080';
+const BACKEND_BASE_URL = process.env.REACT_APP_BACKEND_BASE_URL;
 function CookCard({ cook, onBook }) {
     const {
         id,

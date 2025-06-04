@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import './CookProfile.css';
 
 
-const BACKEND_BASE_URL = process.env.REACT_APP_BACKEND_BASE_URL || 'http://localhost:8080';
+const BACKEND_BASE_URL = process.env.REACT_APP_BACKEND_BASE_URL ;
 
 async function fetchApi(urlPath, options = {}) {
     console.log("fetchApi (CookProfile scope) called with path:", urlPath, "and options:", options);
