@@ -1,62 +1,58 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import './CookProfile.css';
-async function fetchApi(url, options = {}) {
-    console.log("fetchApi called with:", url, options);
+
+
+const BACKEND_BASE_URL = process.env.REACT_APP_BACKEND_BASE_URL || 'http://localhost:8080';
+
+async function fetchApi(urlPath, options = {}) {
+    console.log("fetchApi (CookProfile scope) called with path:", urlPath, "and options:", options);
     const token = localStorage.getItem('authToken');
     const defaultHeaders = {
         ...(options.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
         ...(token && { 'Authorization': `Bearer ${token}` })
     };
-
-    try {
-        const response = await fetch(url, {
+    const fullUrl = `${BACKEND_BASE_URL}${urlPath.startsWith('/') ? urlPath : '/' + urlPath}`;
+        try {
+        const response = await fetch(fullUrl, {
             ...options,
-            headers: {
-                ...defaultHeaders,
-                ...options.headers,
-            },
+            headers: { ...defaultHeaders, ...options.headers },
         });
-        console.log("fetchApi - Response status:", response.status, response.statusText);
-
-        let responseData = {};
-        if (response.status === 204 || response.headers.get('content-length') === '0') {
-            responseData = { message: "Operation successful (no content)" };
-        } else {
-            try {
-                responseData = await response.json();
-                console.log("fetchApi - Response data:", responseData);
-            } catch (jsonError) {
-                console.error("fetchApi - Failed to parse JSON response:", jsonError);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status} - Response body not readable.`);
-                }
-                console.warn("fetchApi - JSON parsing failed on likely successful response.");
-                responseData = { message: "Operation successful (response not JSON)" };
-            }
-        }
+        console.log("fetchApi - Response status:", response.status, response.statusText, "for URL:", fullUrl);
 
         if (!response.ok) {
-            // Use parsed message if available, otherwise status text or default
-            const errorMsg = responseData?.message || response.statusText || `HTTP error! Status: ${response.status}`;
-            // Throw an error object for better debugging
-            const error = new Error(errorMsg);
-            error.status = response.status; // Add status to error object
-            error.data = responseData; // Add data if available
+            let errorData;
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.includes("application/json")) {
+                try { errorData = await response.json(); } catch (e) { errorData = { message: response.statusText || "Server error, could not parse JSON error." }; }
+            } else {
+                const errorText = await response.text(); console.error("fetchApi - Non-JSON error response text (!ok):", errorText);
+                errorData = { message: response.statusText || `Server error (${response.status}), response not JSON.` };
+            }
+            const error = new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+            error.status = response.status; error.data = errorData;
             throw error;
         }
-        return responseData; // Return parsed data on success
+        if (response.status === 204 || (response.headers.get('content-length') && parseInt(response.headers.get('content-length')) === 0)) {
+            return options.method === 'GET' ? null : { message: "Operation successful (no content)" };
+        }
+        try {
+            const responseData = await response.json(); return responseData;
+        } catch (jsonError) {
+            console.error("fetchApi - Failed to parse JSON on successful-status response. URL:", fullUrl, "Error:", jsonError.message);
+            const responseText = await response.text(); console.error("fetchApi - Actual non-JSON response text (ok but not json):", responseText);
+            throw new Error(`Server returned status ${response.status} but response was not valid JSON.`);
+        }
     } catch (error) {
-        console.error("fetchApi - Catch block error:", error);
-        // Re-throw the error so the component's catch block receives it
+        console.error("fetchApi - Catch block error. URL:", fullUrl, "Error details:", error);
         throw error;
     }
 }
 
 const AVAILABILITY_OPTIONS = ["Available for projects", "Busy", "Not Available"];
-const EXPERTISE_LIMIT = 5; // Example limit
+const EXPERTISE_LIMIT = 5;
 
-function CookProfile({ onLoginSuccess }) {
+function CookProfile() {
     const [name, setName] = useState('');
     const [phone, setPhone] = useState('');
     const [expertiseInput, setExpertiseInput] = useState('');
@@ -70,27 +66,81 @@ function CookProfile({ onLoginSuccess }) {
     const [isLoading, setIsLoading] = useState(false);
     const [isLocating, setIsLocating] = useState(false);
     const [error, setError] = useState(null);
+    const [existingProfilePictureUrl, setExistingProfilePictureUrl] = useState('');
     const [successMessage, setSuccessMessage] = useState(null);
+    const [isFetchingProfile, setIsFetchingProfile] = useState(true); 
+    const [chargesPerMeal,setChargesPerMeal] = useState('');
+    const [detectedPlaceName, setDetectedPlaceName] = useState('');
     const navigate = useNavigate();
 
-    const { setupToken } = useParams();
+    const fetchPlaceNameForCoords = async (latitude, longitude) => {
+        if (latitude !== null && longitude !== null) {
+            try {
+                setDetectedPlaceName("Fetching area name...");
+                const geoData = await fetchApi(`/api/location/reverse-geocode?lat=${latitude}&lon=${longitude}`);
+                if (geoData && geoData.displayName) {
+                    setDetectedPlaceName(geoData.displayName);
+                } else {
+                    setDetectedPlaceName("Could not determine area name.");
+                }
+            } catch (e) {
+                console.error("Error fetching place name preview:", e);
+                setDetectedPlaceName("Error getting area name.");
+            }
+        } else {
+            setDetectedPlaceName('');
+        }
+    }
+
 
     useEffect(() => {
-        console.log("CookProfile - Received setupToken:", setupToken);
-        if (!setupToken) {
-            setError("Setup token missing. Cannot complete profile.");
-            // navigate('/signin');
-        }
-    }, [setupToken]);
+        const loadExistingProfile = async () => {
+            setIsFetchingProfile(true);
+            setError(null);
+            console.log("CookProfile: Attempting to load existing profile...");
+            try {
+                const data = await fetchApi('/api/users/me/profile'); // GET request
+                if (data) {
+                    console.log("CookProfile: Existing profile data received:", data);
+                    setName(data.cookname || '');
+                    setPhone(data.phone || '');
+                    setDetectedPlaceName(data.placeName || '');
+                    setExpertiseList(Array.isArray(data.expertise) ? data.expertise : []);
+                    setAvailability(data.availabilityStatus || AVAILABILITY_OPTIONS[0]);
+                    setLatitude(data.latitude || null);
+                    setLongitude(data.longitude || null);
+                    setDetectedPlaceName(data.placeName || '')
+                    setChargesPerMeal(data.chargesPerMeal !== null && data.chargesPerMeal !== undefined ? String(data.chargesPerMeal) : '');
+                    if (data.profilePicture) {
+                        const fullImageUrl = data.profilePicture.startsWith('http') 
+                            ? data.profilePicture 
+                            : `${BACKEND_BASE_URL}${data.profilePicture}`;
+                        setProfileImagePreview(fullImageUrl);
+                        setExistingProfilePictureUrl(fullImageUrl); 
+                        console.log("CookProfile: Setting profile image preview to:", fullImageUrl);
+                    } else {
+                        setProfileImagePreview(null); 
+                         setExistingProfilePictureUrl('');
+                    }
+                } else {
+                    console.log("CookProfile: No existing profile data found or empty response.");
+                }
+            } catch (err) {
+                console.error("CookProfile: Failed to load existing profile:", err);
+                setError("Could not load your profile data. Please try refreshing. " + (err.message || ''));
+            } finally {
+                setIsFetchingProfile(false);
+            }
+        };
 
+        loadExistingProfile();
+    }, []);
 
-    // Handler for profile image selection
     const handleImageChange = (event) => {
         const file = event.target.files[0];
         if (file && file.type.startsWith('image/')) {
             setProfileImageFile(file);
-            setError(null); // Clear previous file errors
-            // Create image preview URL
+            setError(null);
             const reader = new FileReader();
             reader.onloadend = () => {
                 setProfileImagePreview(reader.result);
@@ -103,7 +153,6 @@ function CookProfile({ onLoginSuccess }) {
         }
     };
 
-    // Handler for expertise input
     const handleAddExpertise = (e) => {
         e.preventDefault(); // Prevent form submission if inside a form
         const newExpertise = expertiseInput.trim();
@@ -119,10 +168,9 @@ function CookProfile({ onLoginSuccess }) {
         setExpertiseList(expertiseList.filter(exp => exp !== expertiseToRemove));
     };
 
-    // Handler for "Use Current Location" button
     const handleUseCurrentLocation = () => {
         setIsLocating(true);
-        setError(null); // Clear previous location errors
+        setError(null);
         setLatitude(null);
         setLongitude(null);
 
@@ -137,13 +185,11 @@ function CookProfile({ onLoginSuccess }) {
                 setLatitude(position.coords.latitude);
                 setLongitude(position.coords.longitude);
                 setIsLocating(false);
-                // Clear manual address if current location is used (optional)
-                // setManualAddress({ street: '', city: '', state: '', postalCode: '', country: '' });
+                fetchPlaceNameForCoords(latitude, longitude);
             },
             (geoError) => {
                 console.error("Geolocation Error:", geoError);
                 let message = 'Could not get current location.';
-                // ... (switch statement for error codes as in DetailsPage) ...
                 setError(message);
                 setIsLocating(false);
             },
@@ -153,64 +199,40 @@ function CookProfile({ onLoginSuccess }) {
 
 
     const uploadProfileImage = async (fileToUpload) => {
-        setIsUploadingImage(true); // Indicate image upload start
-        setError(null); // Clear previous errors
+        setIsUploadingImage(true); 
+        setError(null); 
 
         const formData = new FormData();
-        formData.append('image', fileToUpload); // 'image' must match @RequestParam("image") in backend
+        formData.append('image', fileToUpload); 
 
         const token = localStorage.getItem('authToken');
-        console.log("Token retrieved for image upload: (154)", token);
+        console.log("Token retrieved for image upload: ", token);
         if (!token) {
             throw new Error("Authentication token not found. Please log in again.");
         }
-        try {
-            console.log("Attempting to upload image...");
-            const response = await fetch('http://localhost:8080/api/users/me/profile/picture', {
+         try {
+            console.log("CookProfile: Attempting to upload image via fetchApi...");
+            const responseData = await fetchApi('/api/users/me/profile/picture', {
                 method: 'POST',
-                headers: { 'Authorization': `Bearer ${token}` },
                 body: formData,
             });
-            console.log("Image upload response status:", response.status);
-
-            // Try to parse JSON even for errors, backend might send { message: "..." }
-            let responseData = {};
-            try {
-                responseData = await response.json();
-                console.log("Image upload response data:", responseData);
-            } catch (e) {
-                console.warn("Could not parse JSON from image upload response");
-            }
-
-
-            if (!response.ok) {
-                // Throw specific error from backend if possible
-                throw new Error(responseData.message || `Image upload failed with status: ${response.status}`);
-            }
-
-            console.log("Image upload successful:", responseData);
-            // Optionally display a temporary success message for image upload
-            // setSuccessMessage("Image uploaded successfully!"); // Or just let the final save handle it
-
-            // No need to return URL if backend associates it with the user automatically
-            // return responseData.imageUrl; // Uncomment if backend returns the URL
-
+            console.log("CookProfile: Image upload successful through fetchApi:", responseData);
+            return responseData;
         } catch (uploadError) {
-            console.error("Image upload failed:", uploadError);
-            // Set error state to show failure to the user
-            setError(`Image upload failed: ${uploadError.message || 'Please try again.'}`);
-            throw uploadError; // Re-throw to stop the main handleSubmit if critical
+            console.error("CookProfile: Image upload failed in uploadProfileImage:", uploadError);
+            throw uploadError; 
         } finally {
             setIsUploadingImage(false);
         }
     };
-    // Handler for form submission
+
     const handleSubmit = async (event) => {
         event.preventDefault();
         setIsLoading(true);
         setError(null);
         setSuccessMessage("Data saved succesfully!");
         const token = localStorage.getItem('authToken');
+        console.log("CookProfile handleSubmit - Token from localStorage:", token);
         if (!token) {
             setError("Not authenticated. Please log in.");
             setIsLoading(false);
@@ -225,50 +247,61 @@ function CookProfile({ onLoginSuccess }) {
 
 
         try {
+             let imageUploadMessage = '';
             if (profileImageFile) {
                 console.log("Profile image file selected, attempting upload...");
-                await uploadProfileImage(profileImageFile);
+                const imageResponse = await uploadProfileImage(profileImageFile); 
+                imageUploadMessage = imageResponse?.message || "Image uploaded."; 
                 console.log("Image upload step completed (or skipped).");
+                setProfileImageFile(null); 
             } else {
                 console.log("No new profile image selected.");
             }
             const profileData = {
-                name,
+                cookname: name, 
                 phone,
                 expertise: expertiseList,
                 availabilityStatus: availability,
                 latitude,
                 longitude,
+                chargesPerMeal: chargesPerMeal ? parseFloat(chargesPerMeal) : null
             };
-            const responseData = await fetchApi('http://localhost:8080/api/users/profile', {
+            console.log("Submitting profile data:", profileData);
+
+            const responseData = await fetchApi('/api/users/me/profile', {
                 method: 'PUT',
                 body: JSON.stringify(profileData),
             });
-            setSuccessMessage(responseData.message || "Profile updated successfully!");
+             let finalSuccessMessage = responseData?.message || "Cook Profile details saved!";
+            if (imageUploadMessage && profileImageFile) { 
+                finalSuccessMessage = `${imageUploadMessage} Profile details saved!`;
+            }
+            setSuccessMessage(responseData?.message || "Cook Profile saved successfully!");
+
             setTimeout(() => {
-                navigate('/details'); // Navigate to cook list or dashboard
-            }, 1500);
+                navigate('/cook-dashboard');
+            }, 2000);
 
         } catch (err) {
-            console.error("handleSubmit Error:", err);
-            let errorMessage = "Failed to save profile. Please try again.";
-            if (err?.message) { errorMessage = err.message; }
-            setError(errorMessage);
+            console.error("Profile save error:", err);
+            setError(err.message || "Failed to save profile.");
             setSuccessMessage(null);
         }
         finally { setIsLoading(false); }
     };
-    const isSaveDisabled = isLoading || isLocating;
+    if (isFetchingProfile) {
+        return <div className="profile-loading-message">Loading your profile...</div>;
+    }
+
     return (
         < div className="cook-profile-setup-container">
-            <h2>Set Up Your Cook Profile</h2>
+            <h2>{name || existingProfilePictureUrl ? 'Edit Your Cook Profile' : 'Set Up Your Cook Profile'}</h2>
 
             {error && <p className="error-message">{error}</p>}
             {successMessage && <p className="success-message">{successMessage}</p>}
 
             <form onSubmit={handleSubmit} className="profile-form">
 
-                {/* Profile Image */}
                 <div className="form-group form-group-image">
                     <label htmlFor="profileImage">Profile Picture</label>
                     <div className="image-preview-container">
@@ -281,15 +314,13 @@ function CookProfile({ onLoginSuccess }) {
                             type="file"
                             id="profileImage"
                             accept="image/png, image/jpeg, image/gif"
+                            style={{ display: 'none' }} 
                             onChange={handleImageChange}
                             disabled={isLoading}
                         />
-                        {/* Button style depends on your CSS */}
                         <button type="button" onClick={() => document.getElementById('profileImage').click()} disabled={isLoading}>
                             Choose Image
                         </button>
-                        {/* Add separate upload button if handling upload separately */}
-                        {/* {profileImageFile && <button type="button" onClick={handleImageUpload}>Upload Image</button>} */}
                     </div>
                 </div>
 
@@ -307,11 +338,11 @@ function CookProfile({ onLoginSuccess }) {
                     />
                 </div>
 
-                {/* Phone */}
+
                 <div className="form-group">
                     <label htmlFor="phone">Phone Number</label>
                     <input
-                        type="tel" // Use tel type
+                        type="tel"
                         id="phone"
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
@@ -320,7 +351,6 @@ function CookProfile({ onLoginSuccess }) {
                     />
                 </div>
 
-                {/* Expertise */}
                 <div className="form-group">
                     <label htmlFor="expertise">Expertise (e.g., Indian, Italian, Baking)</label>
                     <div className="expertise-input-group">
@@ -334,7 +364,7 @@ function CookProfile({ onLoginSuccess }) {
                             placeholder={`Add up to ${EXPERTISE_LIMIT} tags`}
                         />
                         <button
-                            type="button" // Prevent form submission
+                            type="button"
                             onClick={handleAddExpertise}
                             disabled={isLoading || !expertiseInput.trim() || expertiseList.length >= EXPERTISE_LIMIT}
                             className="add-tag-button"
@@ -353,14 +383,26 @@ function CookProfile({ onLoginSuccess }) {
                                     aria-label={`Remove ${exp}`}
                                     disabled={isLoading}
                                 >
-                                    × {/* Multiplication sign for 'x' */}
+                                    × 
                                 </button>
                             </span>
                         ))}
                     </div>
                 </div>
+            <div className="form-group">
+                <label htmlFor="chargesPerMeal">Charges per Meal (₹)</label>
+                <input
+                    type="number"
+                    id="chargesPerMeal"
+                    value={chargesPerMeal}
+                    onChange={(e) => setChargesPerMeal(e.target.value)}
+                    placeholder="e.g., 250"
+                    min="0" 
+                    step="any" 
+                    disabled={isLoading}
+                />
+            </div>
 
-                {/* Availability */}
                 <div className="form-group">
                     <label htmlFor="availability">Availability Status</label>
                     <select
@@ -376,13 +418,18 @@ function CookProfile({ onLoginSuccess }) {
                     </select>
                 </div>
 
-                {/* Location */}
                 <div className="form-group form-group-location">
                     <label>Your Location</label>
-                    <p className="location-info">
-                        {latitude !== null && longitude !== null
-                            ? `Current: Lat ${latitude.toFixed(5)}, Lon ${longitude.toFixed(5)}`
-                            : "Location not set."}
+                     <p className="location-info">
+                        {isLocating ? (
+                            "Getting current location..."
+                        ) : detectedPlaceName && !detectedPlaceName.toLowerCase().includes("error") && !detectedPlaceName.toLowerCase().includes("could not determine") ? (
+                            <span className="detected-place-name">Current Area: {detectedPlaceName}</span>
+                        ) : latitude !== null && longitude !== null ? (
+                            `Current: Lat ${latitude.toFixed(4)}, Lon ${longitude.toFixed(4)} (Area name lookup pending or failed)`
+                        ) : (
+                            "Location not set. Click below to use current location."
+                        )}
                     </p>
                     <button
                         type="button"
@@ -392,16 +439,8 @@ function CookProfile({ onLoginSuccess }) {
                     >
                         {isLocating ? 'Getting Location...' : 'Use Current Location'}
                     </button>
-                    {/* Add Manual Address Inputs or Place Autocomplete Here if needed */}
-                    {/* Example Manual Inputs:
-                    <input type="text" placeholder="Street Address" ... />
-                    <input type="text" placeholder="City" ... />
-                    ... etc ...
-                    */}
                 </div>
 
-
-                {/* Submit Button */}
                 <div className="form-actions">
                     <button type="submit" className="submit-button primary-button" disabled={isLoading || isLocating}>
                         {isLoading ? 'Saving...' : 'Save Profile'}

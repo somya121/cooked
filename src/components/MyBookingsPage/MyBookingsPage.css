@@ -1,0 +1,173 @@
+.my-bookings-page-container {
+    max-width: 1000px;
+    margin: 20px auto;
+    padding: 20px;
+}
+
+.my-bookings-title {
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+    font-size: 2em;
+}
+
+.status-message-bookings,
+.error-message-bookings,
+.no-bookings-message {
+    text-align: center;
+    font-size: 1.1em;
+    padding: 20px;
+    margin-top: 20px;
+    color: #555;
+}
+
+.error-message-bookings {
+    color: #dc3545;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+}
+
+.bookings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 25px;
+}
+
+.booking-card-user {
+    position: relative; 
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+.booking-card-user:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+
+.booking-card-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.booking-card-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.booking-status {
+    font-size: 0.85em;
+    font-weight: bold;
+    padding: 4px 10px;
+    border-radius: 12px;
+    text-transform: uppercase;
+}
+
+.status-pending { background-color: #fff3cd; color: #856404; }
+.status-accepted { background-color: #d4edda; color: #155724; }
+.status-rejected { background-color: #f8d7da; color: #721c24; }
+.status-completed { background-color: #d1ecf1; color: #0c5460; } /* If you add this status */
+.status-cancelled { background-color: #e2e3e5; color: #383d41; } /* If you add this status */
+
+
+.booking-card-body {
+    padding: 15px 20px;
+    flex-grow: 1; /* Allows body to take available space */
+}
+
+.booking-card-body p {
+    font-size: 0.95em;
+    line-height: 1.6;
+    color: #454545;
+    margin: 0 0 10px 0;
+}
+.booking-card-body p strong {
+    color: #333;
+}
+
+
+.booking-card-footer {
+    padding: 10px 20px;
+    border-top: 1px solid #f0f0f0;
+    background-color: #f9f9f9;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8em;
+    color: #777;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+.booking-id, .booking-date {
+    margin: 0;
+}
+.delete-booking-button {
+    position: absolute;
+    top: 10px;  /* Adjust top/right for desired placement */
+    right: 10px; /* Adjust top/right for desired placement */
+    background-color: rgba(220, 53, 69, 0.15); /* Slightly more visible */
+    color: #dc3545;
+    border: 1px solid rgba(220, 53, 69, 0.4);
+    border-radius: 50%;
+    width: 26px;  /* Slightly smaller or adjust as needed */
+    height: 26px;
+    font-size: 16px;
+    font-weight: bold; /* Make the 'x' a bit bolder */
+    line-height: 24px; /* Adjust to vertically center the 'x' */
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    padding: 0;
+    z-index: 10; /* Ensure it's above other card content */
+}
+
+.delete-booking-button:hover {
+    background-color: #dc3545;
+    color: white;
+    border-color: #c82333; /* Darker red border on hover */
+    transform: scale(1.1);
+}
+.success-message-bookings, .error-message-bookings { /* Ensure these are styled */
+    text-align: center;
+    padding: 10px;
+    margin: 10px auto;
+    border-radius: 4px;
+    max-width: 600px;
+}
+.success-message-bookings {
+    background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;
+}
+/* .error-message-bookings is already styled from previous step */
+
+.rate-cook-button { /* Style for the rate button if not already done */
+    padding: 8px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+.rate-cook-button:hover {
+    background-color: #0056b3;
+}
+.rate-service-user, .payment-due-user {
+    padding: 10px 0; /* Add some padding within these sections */
+    margin-top: 10px;
+    border-top: 1px dashed #eee; /* Separator */
+}
+.small-text {
+    font-size: 0.85em;
+    color: #666;
+    margin-top: 5px;
+}

@@ -1,0 +1,224 @@
+/* CookDashboard.css */
+.cook-dashboard-container {
+    max-width: 1100px;
+    margin: 20px auto;
+    padding: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.loading-dashboard, .error-dashboard {
+    text-align: center;
+    padding: 40px;
+    font-size: 1.2em;
+    color: #555;
+}
+.error-dashboard {
+    color: #dc3545;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 5px;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.dashboard-header h1 {
+    font-size: 2em;
+    color: #333;
+    margin: 0;
+}
+
+.edit-profile-button {
+    padding: 10px 20px;
+    font-size: 0.95em;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+.edit-profile-button:hover {
+    background-color: #0056b3;
+}
+
+/* Profile Summary Card */
+.profile-summary-card {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    border: 1px solid #e9ecef;
+}
+.profile-summary-card h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #28a745; /* Green for welcome */
+}
+.profile-summary-card p {
+    margin-bottom: 8px;
+    color: #495057;
+}
+.availability-status {
+    font-weight: bold;
+    padding: 3px 8px;
+    border-radius: 4px;
+    display: inline-block; /* So padding works nicely */
+}
+.status-available-for-projects { background-color: #d4edda; color: #155724; }
+.status-busy { background-color: #fff3cd; color: #856404; }
+.status-not-available { background-color: #f8d7da; color: #721c24; }
+.status-not-set { background-color: #e2e3e5; color: #383d41; }
+
+
+/* Notifications Preview for Cook */
+.notifications-preview-cook {
+    margin-bottom: 30px;
+    padding: 15px;
+    background-color: #fff;
+    border-radius: 8px;
+    border: 1px solid #eee;
+}
+.notifications-preview-cook h2 {
+    margin-top: 0;
+    font-size: 1.4em;
+    color: #333;
+    margin-bottom: 10px;
+}
+.notification-item-cook {
+    padding: 8px 0;
+    border-bottom: 1px dashed #f0f0f0;
+    font-size: 0.95em;
+    color: #555;
+}
+.notification-item-cook:last-child {
+    border-bottom: none;
+}
+.notification-timestamp-cook {
+    font-size: 0.85em;
+    color: #777;
+    margin-left: 10px;
+}
+.no-notifications-cook, .no-bookings-cook {
+    color: #777;
+    font-style: italic;
+    padding: 10px 0;
+}
+
+
+/* Bookings Management Section */
+.bookings-management h2 {
+    font-size: 1.6em;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.cook-bookings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 25px;
+}
+
+.cook-booking-card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.07);
+    display: flex;
+    flex-direction: column;
+    border-left: 5px solid transparent; /* For status color indication */
+}
+/* Status background/border colors */
+.status-bg-pending { border-left-color: #ffc107; /* Amber */ }
+.status-bg-accepted { border-left-color: #28a745; /* Green */ }
+.status-bg-rejected { border-left-color: #dc3545; /* Red */ }
+.status-bg-completed { border-left-color: #17a2b8; /* Info Blue */ }
+
+
+.cook-booking-card-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.cook-booking-card-header h3 {
+    margin: 0;
+    font-size: 1.2em;
+    color: #343a40;
+}
+
+.booking-status-cook {
+    font-size: 0.9em;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 15px; /* Pill shape */
+}
+.status-text-pending { background-color: #ffc107; color: #212529; }
+.status-text-accepted { background-color: #28a745; color: white; }
+.status-text-rejected { background-color: #dc3545; color: white; }
+.status-text-completed { background-color: #17a2b8; color: white; }
+
+.cook-booking-card-body {
+    padding: 15px 20px;
+    flex-grow: 1;
+}
+.cook-booking-card-body p {
+    margin: 0 0 10px 0;
+    color: #495057;
+    line-height: 1.6;
+}
+.cook-booking-card-body strong {
+    color: #212529;
+}
+
+.cook-booking-actions {
+    padding: 10px 20px;
+    display: flex;
+    gap: 10px;
+    border-top: 1px solid #f0f0f0;
+}
+.action-button {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 500;
+    transition: opacity 0.2s;
+}
+.action-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+.action-button.accept {
+    background-color: #28a745;
+    color: white;
+}
+.action-button.accept:hover:not(:disabled) {
+    background-color: #218838;
+}
+.action-button.reject {
+    background-color: #dc3545;
+    color: white;
+}
+.action-button.reject:hover:not(:disabled) {
+    background-color: #c82333;
+}
+
+.cook-booking-card-footer {
+    padding: 10px 20px;
+    background-color: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+    font-size: 0.8em;
+    color: #6c757d;
+    display: flex;
+    justify-content: space-between;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}

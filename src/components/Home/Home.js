@@ -14,12 +14,11 @@ function Home() {
             Find Cooks Near You
           </Link>
           <Link to="/signup-cook" className="auth-button signup-button">
-            Sign Up As A Cook
+            Join As A Cook
           </Link>
         </div>
       </div>
     </div>
   );
 }
-
 export default Home;

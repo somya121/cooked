@@ -4,6 +4,7 @@ import DetailsPage from "../DetailsPage/DetailsPage";
 import { Link } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
 
+
 function LoginCard({ flowType = 'user', onLoginSuccess }) { 
     const [identifier, setIdentifier] = useState('');
     const [password, setPassword] = useState('');
@@ -13,7 +14,7 @@ function LoginCard({ flowType = 'user', onLoginSuccess }) {
     const [error, setError] = useState(null);
     const [nextStep, setNextStep] = useState('initial');
     const [emailExists, setemailExists] = useState(false);
-    const backendBaseUrl = 'http://localhost:8080'; 
+    const BACKEND_BASE_URL = process.env.REACT_APP_BACKEND_BASE_URL || 'http://localhost:8080';
     const navigate = useNavigate();
 
     const handleContinue = async (event) => {
@@ -21,6 +22,7 @@ function LoginCard({ flowType = 'user', onLoginSuccess }) {
         setIsLoading(true);
         setError(null);
         const backendUrl = '/api/auth/check-identifier';
+        console.log('LoginCard - handleContinue - Email to check:', identifier);
         console.log('Continue with:', identifier);
         if (flowType === 'user') {
 
@@ -34,7 +36,7 @@ function LoginCard({ flowType = 'user', onLoginSuccess }) {
 
         try {
             console.log(`Sending identifier (email) to backend: ${identifier}`);
-            const response = await fetch(`${backendBaseUrl}${backendUrl}`, {
+            const response = await fetch(`${BACKEND_BASE_URL}${backendUrl}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -43,6 +45,7 @@ function LoginCard({ flowType = 'user', onLoginSuccess }) {
             });
 
             const responseData = await response.json();
+            console.log("LoginCard - handleContinue - /check-identifier Raw Response Status:", response.status);
             console.log("Check Identifier Response:", responseData);
             if (!response.ok) {
                 throw new Error(responseData.message || `HTTP error! status: ${response.status}`);
@@ -80,47 +83,66 @@ function LoginCard({ flowType = 'user', onLoginSuccess }) {
         let actionVerb;
 
         if (nextStep === 'login') {
-            url = `${backendBaseUrl}/api/auth/login`;
-            payload = { identifier, password };
+            url = `${BACKEND_BASE_URL}/api/auth/login`;
+            payload = { identifier, password }; // 'identifier' here is the email from state
             actionVerb = "Login";
         } else { // register step
-            payload = { identifier, username, password };
-            url = (flowType === 'cook')
-                ? `${backendBaseUrl}/api/auth/register/cook` // Cook registration endpoint
-                : `${backendBaseUrl}/api/auth/register/user`; // User registration endpoint
-            actionVerb = (flowType === 'cook') ? "Cook Registration" : "User Registration";
+            payload = { identifier, username, password }; // 'identifier' here is the email from state
+            if (flowType === 'cook') {
+                url = `${BACKEND_BASE_URL}/api/auth/register/cook`;
+                actionVerb = "Cook Registration Initiation";
+            } else {
+                url = `${BACKEND_BASE_URL}/api/auth/register/user`;
+                actionVerb = "User Registration";
+            }
         }
 
         console.log(`Submitting ${actionVerb} to ${url} with payload:`, payload);
         try {
-            const response = await fetch(url, {
+            // *** 1. Make the fetch call AND GET THE RAW RESPONSE ***
+            const response = await fetch(url, { // Assign to 'response'
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
             });
 
-            const responseData = await response.json(); // Attempt to parse JSON
+            // *** 2. PARSE THE JSON BODY FROM THE RESPONSE ***
+            const responseData = await response.json(); // This was missing
 
+            // *** 3. CHECK IF THE RESPONSE WAS OK (HTTP 2xx status) ***
             if (!response.ok) {
+                // If not ok, throw an error using the message from the parsed JSON body
                 throw new Error(responseData.message || `HTTP error! Status: ${response.status}`);
             }
 
             // --- Success ---
-            console.log(`${actionVerb} Successful:`, responseData);
+            console.log(`${actionVerb} API Response Data (parsed):`, responseData); // Log the parsed data
+            console.log(`${actionVerb} Successful`); // Simplified success log
 
             if (typeof onLoginSuccess === 'function') {
-                onLoginSuccess(responseData);
+                onLoginSuccess(responseData); // Pass the PARSED JSON data up
             } else {
-                console.error("onLoginSuccess callback is missing!");
-
-        } 
-    }catch (err) {
+                console.error("CRITICAL: onLoginSuccess callback is missing in LoginCard!");
+                setError("Login/Registration succeeded, but navigation failed. Please try refreshing.");
+            }
+        } catch (err) {
             console.error(`${actionVerb} failed:`, err);
-            setError(err.message || `An unexpected error occurred during ${actionVerb}.`);
-        } finally {
+            // The err.message should now correctly come from the backend's JSON response if !response.ok
+            // or from network/parsing errors.
+            setError(err.message || `An unexpected error occurred.`);
 
+            // Keep user on the current form for retry
+            if (nextStep === 'register' && (err.message?.includes("taken") || err.message?.includes("exists"))) {
+                // Specific error for already taken username/email
+            } else if (nextStep === 'login' && (err.message?.includes("Invalid") || err.status === 401 || err.status === 403)) {
+                // Login specific error
+            } else if (nextStep === 'register') {
+                // Other registration error
+            } else {
+                // Fallback to login step if it was a login attempt and error was not specific
+                setNextStep('login');
+            }
+        } finally {
             setIsLoading(false);
         }
     };
@@ -138,8 +160,9 @@ function LoginCard({ flowType = 'user', onLoginSuccess }) {
             {error && <p className="error-message">{error}</p>}
             {nextStep === 'initial' && (
                 <>
-                    <h2 className="card-title">What's your email?</h2>
+                    <h2>{flowType === 'cook' ? 'Cook Sign Up / Login In' : 'Sign In or Sign Up'}</h2>
                     <form onSubmit={handleContinue} className="login-form">
+                        <p>Please enter your email to continue:</p>
                         <div className="form-group">
                             <input
                                 type="email"
@@ -154,19 +177,19 @@ function LoginCard({ flowType = 'user', onLoginSuccess }) {
                             />
                         </div>
                         <button type="submit" className="submit-button primary-button" disabled={isLoading}>
-                            {isLoading ? 'Checking...' : 'Continue'}
+                            {isLoading ? 'Processing...' : 'Continue'}
                         </button>
                     </form>
                 </>
             )}
 
- {/* == Register Step: Create Password == */}
  {nextStep === 'register' && (
                 <>
-                    <h2 className="card-title">Create your account</h2>
-                    <p className="identifier-display">Creating account for: {identifier}</p>
+                    <h2>Create Account {flowType === 'cook' ? '(as a Cook)' : ''}</h2>
+                    <p className="identifier-display">Email: {identifier}</p>
                     <form onSubmit={handleFinalSubmit} className="login-form">
                         <div className="form-group">
+                            <label htmlFor="usernameReg">Username</label>
                             <input
                                 type="text"
                                 id="username"
@@ -181,6 +204,7 @@ function LoginCard({ flowType = 'user', onLoginSuccess }) {
                             />
                         </div>
                         <div className="form-group">
+                            <label htmlFor="passwordReg">Password</label>
                             <input
                                 type="password"
                                 id="password"
@@ -194,27 +218,26 @@ function LoginCard({ flowType = 'user', onLoginSuccess }) {
                                 autoFocus // Focus password field automatically
                             />
                         </div>
-                        {/* Optional: Add confirm password field here */}
                         <button type="submit" className="submit-button primary-button" disabled={isLoading}>
-                            {isLoading ? 'Creating Account...' : 'Create Account'}
+                            {isLoading ? 'Creating...' : 'Create Account'}
                         </button>
                         <button type="button" onClick={() => { setNextStep('initial'); setError(null); setPassword(''); }} className="link-button" hidden={!userNameExists}>
                             Use a different username
                         </button>
                         <button type="button" onClick={handleGoBack} className="link-button" disabled={isLoading}>
-                            Cancel
+                            Back to email entry
                         </button>
                     </form>
                 </>
             )}
 
-            {/* == Login Step: Enter Password == */}
             {nextStep === 'login' && (
                 <>
-                    <h2 className="card-title">Enter your password</h2>
-                    <p className="identifier-display">Logging in as: {identifier}</p>
+                    <h2>Sign In</h2>
+                    <p className="identifier-display">Email: {identifier}</p>
                     <form onSubmit={handleFinalSubmit} className="login-form">
                         <div className="form-group">
+                            <label htmlFor="passwordLogin">Password</label>
                             <input
                                 type="password"
                                 id="password"
@@ -231,9 +254,13 @@ function LoginCard({ flowType = 'user', onLoginSuccess }) {
                         <button type="submit" className="submit-button primary-button" disabled={isLoading}>
                             {isLoading ? 'Signing In...' : 'Sign In'}
                         </button>
-                        <Link className = "back-link" onClick={(e)=>{e.preventDefault();setNextStep('initial')}} >
-                            Go Back
-                        </Link>
+                        <button type="button" onClick={handleGoBack} className="link-button" disabled={isLoading}>
+                            Use a different email
+                        </button>
+                         {/* Option to go to registration if they don't have an account */}
+                         <p style={{marginTop: '10px', fontSize: '0.9em'}}>
+                             New here? <button type="button" onClick={() => setNextStep('register')} className="link-button">Create an account</button>
+                         </p>
                     </form>
                 </>
             )}

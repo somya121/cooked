@@ -1,0 +1,74 @@
+.confirmation-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.65); /* Darker backdrop */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1100; /* Ensure it's above other modals if any */
+}
+
+.confirmation-modal-content {
+    background: white;
+    padding: 25px 30px; /* More padding */
+    border-radius: 8px;
+    width: 90%;
+    max-width: 450px; /* Slightly wider */
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
+    text-align: center; /* Center text content */
+}
+
+.confirmation-modal-title {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.4em; /* Larger title */
+    color: #333;
+    font-weight: 600;
+}
+
+.confirmation-modal-message {
+    margin-bottom: 25px; /* More space before buttons */
+    font-size: 1.05em;
+    color: #555;
+    line-height: 1.6;
+}
+
+.confirmation-modal-actions {
+    display: flex;
+    justify-content: center; /* Center buttons */
+    gap: 15px; /* Space between buttons */
+}
+
+/* Re-use or define button styles. These are examples. */
+.confirmation-modal-actions button {
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+    font-size: 0.95em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+.confirmation-modal-actions .button-secondary.confirmation-cancel {
+    background-color: #6c757d; /* Grey */
+    color: white;
+    border: 1px solid #6c757d;
+}
+.confirmation-modal-actions .button-secondary.confirmation-cancel:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+}
+
+.confirmation-modal-actions .button-danger.confirmation-confirm {
+    background-color: #dc3545; /* Red for destructive action */
+    color: white;
+    border: 1px solid #dc3545;
+}
+.confirmation-modal-actions .button-danger.confirmation-confirm:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+}

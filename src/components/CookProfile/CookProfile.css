@@ -136,7 +136,12 @@
 .form-group-location label {
     margin-bottom: 10px;
 }
+.detected-place-name {
+    font-weight: 500; 
+    color: #28a745; 
+}
 .location-info {
+    min-height: 20px;
     font-style: italic;
     color: #666;
     margin-bottom: 10px;

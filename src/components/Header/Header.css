@@ -1,17 +1,228 @@
+/* Header.css */
 .app-header {
-    display: flex;
-    align-items: center;
-    height: 70px;        
-    padding: 0 20px;
-    background-color: rgba(227, 167, 101, 0.2); 
-  }
-  
-.header-logo-container{
-    display: flex;
-   align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 25px; /* Increased padding */
+  background-color: #FAF0E6; 
+  border-bottom: 1px solid #DCD0C0;
+  position: sticky; /* Make header sticky */
+  top: 0;
+  z-index: 1000; /* Ensure it's above other content */
+  height: 60px; /* Fixed height for consistency */
 }
-.header-logo{
-    display: block; 
-    max-height: 50px; 
-    width: auto;
+
+.header-logo-container .header-logo {
+  height: 40px; /* Adjust logo size */
+  width: auto;
+}
+
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* Spacing between nav items */
+}
+
+.nav-button-header {
+  background-color: transparent;
+  color: #333;
+  border: 1px solid transparent; 
+  padding: 8px 15px;
+  border-radius: 20px; 
+  cursor: pointer;
+  font-size: 0.95em;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  text-decoration: none; 
+  display: inline-flex; 
+  align-items: center; 
+}
+
+.nav-button-header:hover,
+.nav-button-header.active { 
+  background-color: #e9ecef; 
+  color: #007bff;
+  border-color: #dee2e6;
+}
+
+.nav-button-header.logout-button {
+  color: #dc3545; /* Red for logout text */
+}
+.nav-button-header.logout-button:hover {
+  background-color: #f8d7da; /* Lighter red background on hover */
+  color: #721c24; /* Darker red text on hover */
+  border-color: #f5c6cb;
+}
+
+
+/* Notification Area */
+.notification-area {
+  position: relative;
+}
+
+.notification-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px; /* Make clickable area larger */
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%; /* Make it circular */
+  transition: background-color 0.2s ease;
+}
+.notification-button:hover {
+    background-color: #f0f0f0;
+}
+
+
+.bell-icon-svg { /* If you use an SVG, style it here */
+  font-size: 1.6em; /* Adjust bell size */
+  color: #555;
+}
+
+.notification-badge {
+  position: absolute;
+  top: 2px;      /* Adjusted position */
+  right: 2px;     /* Adjusted position */
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  width: 18px;    /* Fixed size for circle */
+  height: 18px;   /* Fixed size for circle */
+  font-size: 0.7rem; /* Smaller font */
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  border: 1px solid white; /* Border to make it pop */
+}
+
+.notifications-dropdown {
+  position: absolute;
+  top: calc(100% + 10px); /* Position below the bell with some space */
+  right: 0;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 8px; /* More rounded corners */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  width: 320px; 
+  z-index: 1010;
+  max-height: 400px;
+  overflow-y: auto;
+}
+.notifications-dropdown::-webkit-scrollbar {
+    width: 6px;
+}
+.notifications-dropdown::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 3px;
+}
+
+
+.notification-item {
+  padding: 12px 15px;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: default; 
+  transition: background-color 0.2s ease;
+}
+.notification-item:last-child {
+  border-bottom: none;
+}
+.notification-item:hover {
+    background-color: #f8f9fa;
+}
+
+.notification-item.unread {
+  background-color: #e6f7ff; /* A very light blue for unread items */
+}
+.notification-item.unread .notification-message {
+    font-weight: 600; /* Bolder text for unread messages */
+}
+
+.notification-message {
+  margin: 0 0 4px 0;
+  font-size: 0.9em;
+  color: #333;
+  line-height: 1.4;
+}
+
+.notification-timestamp {
+  font-size: 0.75em;
+  color: #777;
+}
+
+.notification-item-empty {
+    padding: 20px;
+    text-align: center;
+    color: #888;
+    font-size: 0.9em;
+}
+.nav-button-container {
+  position: relative; /* To position the dot relative to the button wrapper */
+  display: inline-flex; /* Or flex, if needed for alignment with other items */
+  align-items: center;
+}
+
+.view-all-notifications-link {
+    display: block;
+    text-align: center;
+    padding: 12px;
+    color: #007bff;
+    text-decoration: none;
+    font-size: 0.9em;
+    font-weight: 500;
+    border-top: 1px solid #f0f0f0;
+    transition: background-color 0.2s ease;
+}
+.view-all-notifications-link:hover {
+    background-color: #f8f9fa;
+}
+
+/* Wrapper for content below header */
+.app-content {
+  padding-top: 60px; /* Same as header height to prevent overlap */
+}
+.profile-area-cook {
+    position: relative;
+}
+.profile-dropdown-cook {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    width: 220px; /* Adjust width */
+    z-index: 1010;
+    padding: 10px 0;
+}
+
+.profile-dropdown-item, .profile-dropdown-link {
+    padding: 10px 15px;
+    font-size: 0.9em;
+    color: #333;
+    display: block; /* For links to take full width */
+    text-decoration: none;
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+}
+.profile-dropdown-item strong {
+    margin-right: 5px;
+}
+
+.profile-dropdown-link:hover {
+    background-color: #f8f9fa;
+}
+.profile-dropdown-link.logout-action {
+    color: #dc3545; /* Red for logout */
+    border-top: 1px solid #f0f0f0;
+    margin-top: 5px;
+    padding-top: 10px;
 }

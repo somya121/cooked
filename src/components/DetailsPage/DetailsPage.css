@@ -1,0 +1,171 @@
+/* DetailsPage.css */
+.details-page-container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto; 
+}
+
+.details-content { /* Optional wrapper if needed for specific styling */
+    /* background-color: #f9f9f9; */
+    /* border-radius: 8px; */
+    /* padding: 20px; */
+    /* box-shadow: 0 2px 4px rgba(0,0,0,0.1); */
+}
+
+.page-title {
+    text-align: center;
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 1.8em;
+}
+
+.location-info {
+    text-align: center;
+    color: #555;
+    margin-bottom: 20px;
+    font-size: 0.95em;
+}
+
+.radius-filter-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 25px;
+    gap: 10px;
+}
+
+.radius-label {
+    font-size: 1em;
+    color: #444;
+}
+
+.radius-select {
+    padding: 8px 12px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 0.95em;
+}
+
+.booking-status-message {
+    text-align: center;
+    padding: 10px;
+    margin: 15px auto;
+    border-radius: 4px;
+    max-width: 500px;
+}
+.error-message.booking-status-message { /* Inherits from global .error-message if defined */
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+.success-message.booking-status-message { /* Inherits from global .success-message if defined */
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+
+.status-message,.no-bookings-message { /* For loading, no cooks found, etc. */
+    text-align: center;
+    color: #666;
+    font-size: 1.05em;
+    padding: 20px;
+}
+
+.error-message.centered-message { /* For major errors like location or cook fetch */
+    text-align: center;
+    color: #dc3545;
+    font-size: 1.1em;
+    padding: 20px;
+    background-color: #fff0f1;
+    border: 1px solid #ffccd0;
+    border-radius: 5px;
+}
+
+
+.cooks-list-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); /* Responsive grid */
+    gap: 25px; /* Space between cards */
+    padding-top: 20px 0;
+    width: 100%;
+}
+.cooks-carousel-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 1200px; 
+    margin: 30px auto; /* Increased top/bottom margin */
+    /* Padding is removed from here, arrows will be strictly inside or overlap */
+    box-sizing: border-box;
+}
+
+.cooks-list-carousel {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory; /* Or x proximity for less strict snapping */
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 15px; /* For scrollbar visibility or just spacing */
+    gap: 20px; /* Defines space between .carousel-item elements */
+    
+    /* Consider adding horizontal padding if arrows are outside and you don't want cards to touch edges */
+    /* padding-left: 10px; */
+    /* padding-right: 10px; */
+
+    /* Hide scrollbar (optional) */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* IE 10+ */
+}
+.cooks-list-carousel::-webkit-scrollbar { /* WebKit */
+    display: none;
+}
+
+.carousel-item {
+    flex: 0 0 auto; /* Important: Do not grow or shrink */
+    width: 280px;   /* <<<<------ THIS WIDTH IS IMPORTANT. Match with scrollBy logic. */
+                    /* This should be the width of your CookCard.glass-card-container */
+    scroll-snap-align: start; /* Or center */
+    /* The 'gap' property on the parent handles spacing, so margin-right is not strictly needed here */
+}
+
+.carousel-arrow {
+    position: absolute;
+    top: 50%;
+    /* Adjust transform based on arrow size to perfectly center */
+    transform: translateY(calc(-50% - 10px)); /* Offset by half its height + half of parent padding-bottom if any */
+    background-color: rgba(255, 255, 255, 0.9);
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    width: 44px; /* Slightly larger for easier clicking */
+    height: 44px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    opacity: 0.8; /* Slightly transparent until hover */
+}
+.carousel-arrow:hover {
+    background-color: white;
+    transform: translateY(calc(-50% - 10px)) scale(1.05);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    opacity: 1;
+}
+.carousel-arrow:active {
+    transform: translateY(calc(-50% - 10px)) scale(0.98);
+}
+
+.prev-arrow {
+    left: -22px; /* Half of its width to sit on the edge, or adjust for visual preference */
+}
+
+.next-arrow {
+    right: -22px; /* Half of its width to sit on the edge */
+}
+/* Ensure global error/success message styles if not already defined */
+/* .error-message { color: red; ... } */
+/* .success-message { color: green; ... } */

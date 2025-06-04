@@ -1,0 +1,202 @@
+.glass-card-container {
+  width: 280px; 
+  height: 420px; 
+  perspective: 1000px;
+}
+
+.glass-card {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d; 
+  transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+  border-radius: 20px;
+  /* The main shadow for the card itself */
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.17); /* Example shadow */
+}
+
+.glass-card-container:hover .glass-card {
+  transform: rotateY(180deg); 
+}
+
+.glass-card-front,
+.glass-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden; 
+  border-radius: 20px;
+  overflow: hidden; 
+  
+  /* --- Glassmorphism Core --- */
+  /* 1. Base transparency and a hint of color */
+  background: rgba(255, 255, 255, 0.25); /* Increase opacity slightly for more substance */
+
+  /* 2. The Blur Effect - this blurs what's BEHIND the element */
+  backdrop-filter: blur(10px); 
+  -webkit-backdrop-filter: blur(10px); 
+
+  /* 3. Subtle Border to give an edge */
+  border: 1px solid rgba(255, 255, 255, 0.35);
+
+  /* 4. Inner shadow for depth (optional, can make it look less flat) */
+  /* box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2), 0 1px 3px rgba(0,0,0,0.1); */
+  
+  /* 5. Optional: Add a very subtle noise texture or linear gradient directly on the card face */
+  /* This can make the "glass" look less sterile if page background is plain */
+  /* background-image: 
+    linear-gradient(to bottom right, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 50%, rgba(255,255,255,0.1) 100%),
+    url('/images/subtle-noise.png'); /* You'd need a very subtle noise image */
+  /* background-blend-mode: overlay; */
+
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; /* Default for front, back might override */
+  text-align: center;
+  padding: 20px;
+  box-sizing: border-box;
+  color: #333; /* Ensure text is readable */
+}
+
+/* --- Front Side Styling --- */
+.glass-card-front {
+  justify-content: space-around; 
+}
+
+.front-avatar {
+  width: 100px; 
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.7); /* Slightly more opaque border */
+  margin-bottom: 15px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+}
+
+.front-name {
+  font-size: 1.8em;
+  font-weight: 600;
+  margin: 10px 0 5px 0;
+  color: #2c3e50; /* Darker, more legible text */
+}
+
+.front-tagline {
+  font-size: 0.9em;
+  color: #4a4a4a; /* Darker grey for tagline */
+  margin-bottom: 8px;
+}
+.front-charges {
+  font-size: 1.1em;
+  font-weight: 500;
+  color: #1a1a1a; 
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+.front-rating {
+  font-size: 0.9em;
+  color: #e67e22; /* Orange/gold for rating */
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+
+.front-hover-prompt{
+  font-size: 0.8em;
+  color: #666;
+  font-style: italic;
+  margin-top: auto; /* Push to bottom */
+  padding-top: 10px;
+}
+
+
+/* --- Back Side Styling --- */
+.glass-card-back {
+  transform: rotateY(180deg); 
+  /* Slightly different base background for the back if desired */
+  background: rgba(245, 249, 250, 0.3); /* Slightly more opaque and different tint */
+  backdrop-filter: blur(10px); /* Keep consistent blur */
+  border: 1px solid rgba(255, 255, 255, 0.4); /* Slightly more defined border */
+  justify-content: space-between; 
+  color: #333; 
+}
+
+.back-title { /* This is actually the availability status wrapper */
+  font-size: 1.1em;
+  font-weight: 500;
+  margin-top: 0;
+  margin-bottom: 15px;
+  width: 100%;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(51, 51, 51, 0.15); /* Darker border for readability */
+}
+
+.back-details-scroll {
+  flex-grow: 1;
+  overflow-y: auto; 
+  width: 100%;
+  padding-right: 5px; 
+  margin-bottom: 15px;
+}
+.back-details-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+.back-details-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(0,0,0,0.2);
+  border-radius: 3px;
+}
+
+.back-detail-item {
+  font-size: 0.9em;
+  margin-bottom: 10px;
+  text-align: left;
+  line-height: 1.5;
+  color: #333; /* Ensure good contrast */
+}
+.back-detail-item strong {
+  font-weight: 600;
+  margin-right: 8px;
+  color: #111;
+}
+.contact-info-back a {
+    color: #0066cc;
+    text-decoration: none;
+}
+.contact-info-back a:hover {
+    text-decoration: underline;
+}
+
+
+.back-tag-availability {
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-size: 0.85em;
+  font-weight: 500;
+  display: inline-block;
+  margin-left: 5px;
+}
+.back-tag-availability.availability-available-for-projects { background-color: #d4edda; color: #155724; }
+.back-tag-availability.availability-busy { background-color: #fff3cd; color: #856404; }
+.back-tag-availability.availability-not-available { background-color: #f8d7da; color: #721c24; }
+.back-tag-availability.availability-unknown,
+.back-tag-availability.availability-not-specified { background-color: #e2e3e5; color: #383d41; }
+
+
+.back-book-button {
+  padding: 12px 20px;
+  width: 100%;
+  max-width: 220px;
+  margin-top: 10px; 
+  border: none;
+  border-radius: 8px;
+  background-color: #007bff;
+  color: white;
+  font-size: 1em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.back-book-button:hover {
+  background-color: #0056b3;
+}
